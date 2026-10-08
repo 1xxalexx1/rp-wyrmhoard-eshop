@@ -1,0 +1,16 @@
+@import url("https://fonts.googleapis.com/css2?family=Jacquard+12&family=VT323&display=swap");
+@import "tailwindcss"; /* goes AFTER everything else */
+
+@theme {
+  --color-*: initial; /* disable all default colors */
+  --color-ink: #15120c; /* page background. flat, solid, never patterned. */
+  --color-surface: #1d1910; /* panels, inputs, status bar. */
+  --color-yellow: #f5c518; /* featured dither, active borders, primary buttons, prices. */
+  --color-yellow-dim: #6b5710; /* ambient engravings, inactive borders, rules. */
+  --color-cream: #e8dcb8; /* text, headings, tarot card faces. */
+  --color-cream-muted: #b0a060; /* secondary text, labels, frame titles. */
+  --color-test: #ff0000; /* test borders, placeholders, etc. */
+
+  --font-jac: "Jacquard 12", system-ui;
+  --font-vt: "VT323", monospace;
+}
