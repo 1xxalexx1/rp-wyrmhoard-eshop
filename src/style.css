@@ -13,4 +13,10 @@
 
   --font-jac: "Jacquard 12", system-ui;
   --font-vt: "VT323", monospace;
+
+  --text-sm: 20px;
+  --text-base: 22px;
+  --text-lg: 28px;
+  --text-xl: 36px;
+  --text-2xl: 48px;
 }
