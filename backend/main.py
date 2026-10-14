@@ -1,11 +1,21 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+# from enum import Enum
+
+""" class Label(Enum):
+    DICE = 1,
+    MINI = 2,
+    BOOKS = 3,
+    #Enum.SOMETHING.name = string value
+    #Enum.SOMETHING.value = int value
+    #Enum.SOMETHING = Enum.SOMETHIN """
 
 products = {
-    1:{"name": "dice set", "price": 10.00, "stock": 12 },
-    2:{"name": "Rule book", "price": 30.50, "stock": 5},
-    3:{"name": "Wizzard mini","price": 5.65,"stock": 30,}
-}
+    1:{"name": "Cursed Dice Set", "price": 10.00, "stock": 12, "label": "Dice"},
+    2:{"name": "Rule book", "price": 30.50, "stock": 5, "label": "Books"},
+    3:{"name": "Bear Wizzard mini","price": 5.65,"stock": 30, "label": "Minis"},
+    4:{"name": "Toilet dice tray","price": 30.50,"stock": 0, "label": "Accessories"},
+    }
 
 app = FastAPI()
 
