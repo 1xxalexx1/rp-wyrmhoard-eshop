@@ -1,21 +1,35 @@
-from fastapi import FastAPI
+from typing import Annotated
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-# from enum import Enum
+from sqlmodel import Field, Session, SQLModel, create_engine, select 
+# NOTE: NEVER write SQL as an f string. it WILL make sql injection possible
+# NOTE: switched from pip to uv - do NOT use pip anymore - when switching machines do `uv sync`, to add a package do `uv add {package}` and to run the backend server do `uv run fastapi dev main.py`
 
-""" class Label(Enum):
-    DICE = 1,
-    MINI = 2,
-    BOOKS = 3,
-    #Enum.SOMETHING.name = string value
-    #Enum.SOMETHING.value = int value
-    #Enum.SOMETHING = Enum.SOMETHIN """
 
-products = {
-    1:{"name": "Cursed Dice Set", "price": 10.00, "stock": 12, "label": "Dice"},
-    2:{"name": "Rule book", "price": 30.50, "stock": 5, "label": "Books"},
-    3:{"name": "Bear Wizzard mini","price": 5.65,"stock": 30, "label": "Minis"},
-    4:{"name": "Toilet dice tray","price": 30.50,"stock": 0, "label": "Accessories"},
-    }
+# DB stuff 👍🥺🤤
+
+class Product(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    name: str = Field(index=True)
+    price: float
+    stock: int
+    label: str = Field(index=True)
+
+db_file = "database.db"
+db_url = f"sqlite:///{db_file}" 
+
+db_connection_args = {"check_same_thread": False}
+db_engine = create_engine(db_url, connect_args=db_connection_args)
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(db_engine)
+
+def get_session():
+    with Session(db_engine) as session:
+        yield session
+
+SessionDep = Annotated[Session, Depends(get_session)]
+
 
 app = FastAPI()
 
@@ -26,17 +40,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
 
 @app.get("/")
-async def root():
+def root():
     return {"message": "Hello World"}
 
 @app.get("/products")
-async def get_products():
-    return list(products.values())
+def get_products(session: SessionDep):
+    return session.exec(select(Product)).all()
 
+""" 
 @app.get("/products/{product_id}")
 async def get_product_by_id(product_id: int):
     return products[product_id]
+ """
