@@ -1,18 +1,20 @@
+import type { Category } from "../../types";
+
 interface CardProps {
   name: string;
   price: number;
   stock: number;
-  label: string;
+  category: Category;
 }
 
-const ItemCard = ({ name, price, stock, label }: CardProps) => {
+const ItemCard = ({ name, price, stock, category }: CardProps) => {
   let cond = stock > 0 ? `In Stock: ${stock}` : `Out of stock!`;
 
   return (
     <div>
       <div className="border-yellow-dim relative flex grow flex-col justify-between gap-4 border px-2 py-4">
-        <span className="text-yellow-dim font-vt bg-ink absolute top-0 left-3 -translate-y-1/2 px-1 text-sm">
-          {label}
+        <span className="text-cream-muted font-vt bg-ink absolute top-0 left-3 -translate-y-1/2 px-1 text-sm">
+          {category.name}
         </span>
         <div className="border-yellow-dim text-test font-vt border px-6 py-10 text-center">
           PLACEHOLDER

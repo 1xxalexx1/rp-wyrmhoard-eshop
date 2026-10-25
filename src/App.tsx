@@ -1,49 +1,51 @@
-import Header from "./Header";
-import ItemCard from "./ItemCard";
-import Footer from "./Footer";
+import Header from "./components/general/Header";
+import ItemCard from "./components/products/ItemCard";
+import Footer from "./components/general/Footer";
+import FilterSidebar from "./components/sidebar/FilterSidebar";
 import { useState, useEffect } from "react";
-
-type Products = {
-  name: string;
-  price: number;
-  stock: number;
-  label: string;
-};
+import type { Product, Category } from "./types";
+import { fetchProducts, fetchCategories } from "./fetch";
 
 function App() {
-  const [products, setProducts] = useState<Products[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filters, setFilters] = useState<string[]>([]);
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    let url = "http://127.0.0.1:8000/products";
-    async function startFetching() {
-      let response = await fetch(url);
-
-      if (response.ok) {
-        let json = await response.json();
-        setProducts(json);
-      } else {
-        alert("Somethings gone wrong :(" + response.status);
-      }
+    async function wait() {
+      setAllCategories(await fetchCategories());
     }
-
-    startFetching();
+    wait();
   }, []);
 
-  console.log(products);
+  useEffect(() => {
+    async function wait() {
+      setProducts(await fetchProducts(filters));
+    }
+    wait();
+  }, [filters]);
 
   const renderedCards = products.map((product) => (
     <ItemCard
+      key={product.id}
       name={product.name}
       price={product.price}
       stock={product.stock}
-      label={product.label}
+      category={product.category}
     />
   ));
 
   return (
     <div>
       <Header />
-      <div className="m-4 grid grid-cols-3 gap-8"> {renderedCards}</div>
+      <div className="flex gap-8">
+        <FilterSidebar
+          categories={allCategories}
+          filterStateFunc={setFilters}
+          filterState={filters}
+        />
+        <div className="m-4 grid grow grid-cols-3 gap-8">{renderedCards}</div>
+      </div>
 
       <Footer />
     </div>

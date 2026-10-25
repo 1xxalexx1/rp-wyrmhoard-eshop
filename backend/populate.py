@@ -1,29 +1,41 @@
-from sqlmodel import Session, select, SQLModel
-from main import Product, db_engine, create_db_and_tables
+from sqlmodel import Session, SQLModel
+from main import Products, Categories, db_engine
 
-products = {
-    1:{"name": "Cursed Dice Set", "price": 10.00, "stock": 12, "label": "Dice"},
-    2:{"name": "Rule book", "price": 30.50, "stock": 5, "label": "Books"},
-    3:{"name": "Bear Wizzard mini","price": 5.65,"stock": 30, "label": "Minis"},
-    4:{"name": "Toilet dice tray","price": 30.50,"stock": 0, "label": "Accessories"},
-    5:{"name": "Magic dice", "price": 600.00, "stock": 20, "label": "Dice"},
-    6:{"name": "Cursed Dice Set", "price": 10.00, "stock": 12, "label": "Dice"},
-    7:{"name": "Rule book", "price": 30.50, "stock": 5, "label": "Books"},
-    8:{"name": "Bear Wizzard mini","price": 5.65,"stock": 30, "label": "Minis"},
-    9:{"name": "Toilet dice tray","price": 30.50,"stock": 0, "label": "Accessories"},
-    10:{"name": "Magic dice", "price": 600.00, "stock": 20, "label": "Dice"}
-}
+categories = [
+    {"name": "Dice"},
+    {"name": "Books"},
+    {"name": "Minis"},
+    {"name": "Accessories"},
+]
+
+products = [
+    {"name": "Cursed Dice Set", "price": 10.00, "stock": 12, "category_id": 1},
+    {"name": "Rule book", "price": 30.50, "stock": 5, "category_id": 2},
+    {"name": "Bear Wizzard mini","price": 5.65,"stock": 30, "category_id": 3},
+    {"name": "Toilet dice tray","price": 30.50,"stock": 0, "category_id": 4},
+    {"name": "Magic dice", "price": 600.00, "stock": 20, "category_id": 1},
+    {"name": "Cursed Dice Set", "price": 10.00, "stock": 12, "category_id": 1},
+    {"name": "Rule book", "price": 30.50, "stock": 5, "category_id": 2},
+    {"name": "Bear Wizzard mini","price": 5.65,"stock": 30, "category_id": 3},
+    {"name": "Toilet dice tray","price": 30.50,"stock": 0, "category_id": 4},
+    {"name": "Magic dice", "price": 600.00, "stock": 20, "category_id": 1},
+    {"name": "necronomicon", "price": 6.00, "stock": 2, "category_id": 2},
+]
 
 def seed():
     SQLModel.metadata.drop_all(db_engine)
     SQLModel.metadata.create_all(db_engine)
+    with Session(db_engine) as session:
+        for val in categories:
+            session.add(Categories(**val))
+        session.commit()
 
     with Session(db_engine) as session:
-        for val in products.values():
-            session.add(Product(**val))
-
+        for val in products:
+            session.add(Products(**val))
         session.commit()
-        print("done")
+
+    print("done")
 
 
 

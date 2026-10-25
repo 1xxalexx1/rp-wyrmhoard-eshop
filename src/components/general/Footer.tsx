@@ -1,4 +1,4 @@
-import svg from "./assets/wyrmhoard-mark-currentcolor.svg?raw";
+import svg from "/src/assets/wyrmhoard-mark-currentcolor.svg?raw";
 
 const Footer = () => {
   return (

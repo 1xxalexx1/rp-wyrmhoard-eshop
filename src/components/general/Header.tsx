@@ -1,4 +1,4 @@
-import mark from "./assets/wyrmhoard-mark-currentcolor.svg?raw";
+import mark from "/src/assets/wyrmhoard-mark-currentcolor.svg?raw";
 
 const Header = () => {
   return (
