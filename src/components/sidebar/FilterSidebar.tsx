@@ -36,7 +36,7 @@ function FilterSidebar({
 
   const [open, setOpen] = useState(true);
 
-  let opened = open ? "v" : ">";
+  const opened = open ? "v" : ">";
   return (
     <div>
       <div className="border-yellow-dim relative border px-6 py-4">

@@ -8,7 +8,7 @@ interface CardProps {
 }
 
 const ItemCard = ({ name, price, stock, category }: CardProps) => {
-  let cond = stock > 0 ? `In Stock: ${stock}` : `Out of stock!`;
+  const cond = stock > 0 ? `In Stock: ${stock}` : `Out of stock!`;
 
   return (
     <div>
