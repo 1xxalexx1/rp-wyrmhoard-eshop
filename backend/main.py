@@ -1,12 +1,15 @@
+import os
 from typing import Annotated
-from fastapi import FastAPI, Depends, Query
+
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import Field, Session, SQLModel, create_engine, select, Relationship
+from sqlmodel import Field, Relationship, Session, SQLModel, col, create_engine, select
+
 # NOTE: NEVER write SQL as an f string. it WILL make sql injection possible
 # NOTE: switched from pip to uv - do NOT use pip anymore - when switching machines do `uv sync`, to add a package do `uv add {package}` and to run the backend server do `uv run fastapi dev main.py`
+load_dotenv()
 
-
-# DB stuff 👍🥺🤤
 
 class Categories(SQLModel, table=True):
     # __tablename__ = "categories"
@@ -15,6 +18,7 @@ class Categories(SQLModel, table=True):
     name: str = Field(index=True)
 
     products: list["Products"] = Relationship(back_populates="category")
+
 
 class Products(SQLModel, table=True):
     # __tablename__ = "products"
@@ -26,9 +30,11 @@ class Products(SQLModel, table=True):
     category_id: int = Field(foreign_key="categories.id")
     category: Categories = Relationship(back_populates="products")
 
+
 class CategoriesResponse(SQLModel):
     id: int
     name: str
+
 
 class ProductsResponse(SQLModel):
     id: int
@@ -37,18 +43,23 @@ class ProductsResponse(SQLModel):
     stock: int
     category: CategoriesResponse
 
-db_file = "database.db"
-db_url = f"sqlite:///{db_file}" 
 
-db_connection_args = {"check_same_thread": False}
+# db_file = "database.db"
+db_url = os.getenv("DATABASE_URL", "url not found in .env :(")
+
+db_connection_args = {}
+print(db_url)
 db_engine = create_engine(db_url, connect_args=db_connection_args)
+
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(db_engine)
 
+
 def get_session():
     with Session(db_engine) as session:
         yield session
+
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
@@ -62,13 +73,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
 
+
 @app.get("/")
 def root():
     return {"message": "Hello World"}
+
 
 @app.get("/products", response_model=list[ProductsResponse])
 def get_products(session: SessionDep, category: list[str] | None = Query(default=None)):
@@ -76,15 +90,19 @@ def get_products(session: SessionDep, category: list[str] | None = Query(default
     if category is None:
         statment = select(Products)
     else:
-        statment = select(Products).join(Categories).where(Categories.name.in_(category))
+        statment = (
+            select(Products).join(Categories).where(col(Categories.name).in_(category))
+        )
 
     return session.exec(statment).all()
+
 
 @app.get("/categories")
 def get_categories(session: SessionDep):
     return session.exec(select(Categories)).all()
 
-""" 
+
+"""
 @app.get("/products/{product_id}")
 async def get_product_by_id(product_id: int):
     return products[product_id]
