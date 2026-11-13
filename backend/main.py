@@ -2,7 +2,7 @@ import os
 from typing import Annotated
 
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, Query
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Field, Relationship, Session, SQLModel, col, create_engine, select
 
@@ -11,6 +11,7 @@ from sqlmodel import Field, Relationship, Session, SQLModel, col, create_engine,
 load_dotenv()
 
 
+# database
 class Categories(SQLModel, table=True):
     # __tablename__ = "categories"
 
@@ -44,11 +45,9 @@ class ProductsResponse(SQLModel):
     category: CategoriesResponse
 
 
-# db_file = "database.db"
 db_url = os.getenv("DATABASE_URL", "url not found in .env :(")
 
 db_connection_args = {}
-print(db_url)
 db_engine = create_engine(db_url, connect_args=db_connection_args)
 
 
@@ -63,7 +62,7 @@ def get_session():
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
-
+# backend
 app = FastAPI()
 
 app.add_middleware(
@@ -97,13 +96,15 @@ def get_products(session: SessionDep, category: list[str] | None = Query(default
     return session.exec(statment).all()
 
 
+@app.get("/products/{product_id}", response_model=ProductsResponse)
+def get_product_by_id(session: SessionDep, product_id: int):
+    # statment = select(Products).join(Categories).where(col(Products.id) == product_id)
+    selected_product = session.get(Products, product_id)
+    if selected_product == None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return selected_product
+
+
 @app.get("/categories")
 def get_categories(session: SessionDep):
     return session.exec(select(Categories)).all()
-
-
-"""
-@app.get("/products/{product_id}")
-async def get_product_by_id(product_id: int):
-    return products[product_id]
- """
