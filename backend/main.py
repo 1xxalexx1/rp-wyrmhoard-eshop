@@ -78,12 +78,12 @@ def on_startup():
     create_db_and_tables()
 
 
-@app.get("/")
+@app.get("/api")
 def root():
     return {"message": "Hello World"}
 
 
-@app.get("/products", response_model=list[ProductsResponse])
+@app.get("/api/products", response_model=list[ProductsResponse])
 def get_products(session: SessionDep, category: list[str] | None = Query(default=None)):
 
     if category is None:
@@ -96,7 +96,7 @@ def get_products(session: SessionDep, category: list[str] | None = Query(default
     return session.exec(statment).all()
 
 
-@app.get("/products/{product_id}", response_model=ProductsResponse)
+@app.get("/api/products/{product_id}", response_model=ProductsResponse)
 def get_product_by_id(session: SessionDep, product_id: int):
     # statment = select(Products).join(Categories).where(col(Products.id) == product_id)
     selected_product = session.get(Products, product_id)
@@ -105,6 +105,6 @@ def get_product_by_id(session: SessionDep, product_id: int):
     return selected_product
 
 
-@app.get("/categories")
+@app.get("/api/categories")
 def get_categories(session: SessionDep):
     return session.exec(select(Categories)).all()
