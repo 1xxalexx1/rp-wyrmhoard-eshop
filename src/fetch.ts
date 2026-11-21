@@ -1,7 +1,7 @@
 import type { Category, Product } from "./types";
 
 export async function fetchCategories(): Promise<Category[]> {
-  const url = "http://127.0.0.1:8000/categories";
+  const url = new URL("/api/categories", window.location.origin);
 
   const response = await fetch(url);
   if (response.ok) {
@@ -16,7 +16,7 @@ export async function fetchCategories(): Promise<Category[]> {
 }
 
 export async function fetchProducts(filters: string[]): Promise<Product[]> {
-  const url = new URL("http://127.0.0.1:8000/products");
+  const url = new URL("/api/products", window.location.origin);
   // fun fact: an empty array != null
   if (filters.length > 0) {
     filters.map((cat) => url.searchParams.append("category", cat));
