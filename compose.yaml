@@ -16,8 +16,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  web:
+    build: .
+    depends_on:
+      - backend
     ports:
-      - "8000:8000"
+      - "8081:80"
 
 
 volumes:
