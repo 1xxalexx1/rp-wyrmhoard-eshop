@@ -1,5 +1,6 @@
 services:
   db:
+    restart: unless-stopped
     image: postgres:18
     env_file: .env
     volumes:
@@ -10,6 +11,7 @@ services:
       timeout: 5s
       retries: 10
   backend:
+    restart: unless-stopped
     build: ./backend
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -17,6 +19,7 @@ services:
       db:
         condition: service_healthy
   web:
+    restart: unless-stopped
     build: .
     depends_on:
       - backend
